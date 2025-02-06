@@ -23,6 +23,20 @@ router.post("/add", async (req, res) => {
     }
 });
 
+// Get a specific menu item by ID
+router.get("/update/:id", async (req, res) => {
+    try {
+        const menuItem = await MenuItem.findById(req.params.id);
+        if (!menuItem) {
+            return res.status(404).json({ message: "Menu item not found" });
+        }
+        res.json(menuItem);
+    } catch (error) {
+        res.status(500).json({ message: "Error fetching menu item", error });
+    }
+});
+
+
 // Update menu item
 router.put("/update/:id", async (req, res) => {
     try {
