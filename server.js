@@ -27,11 +27,24 @@ const Admin = mongoose.model("Admin", adminSchema);
 // Manually insert admin credentials (One-time operation)
 const insertAdmin = async () => {
     const existingAdmin = await Admin.findOne({ username: "admin" });
+
     if (!existingAdmin) {
-        // Use environment variables to store sensitive information
+        // Create a new admin if not found
         const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
         await Admin.create({ username: "admin", password: hashedPassword });
         console.log("Admin account created");
+    } else {
+        // Compare stored password with the hashed version of ADMIN_PASSWORD
+        const passwordMatches = await bcrypt.compare(process.env.ADMIN_PASSWORD, existingAdmin.password);
+        
+        if (passwordMatches) {
+            console.log("Admin account already exists with the correct password.");
+        } else {
+            // Update the password if it does not match
+            const newHashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
+            await Admin.updateOne({ username: "admin" }, { $set: { password: newHashedPassword } });
+            console.log("Admin password updated.");
+        }
     }
 };
 insertAdmin();

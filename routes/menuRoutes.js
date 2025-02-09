@@ -36,7 +36,6 @@ router.get("/update/:id", async (req, res) => {
     }
 });
 
-
 // Update menu item
 router.put("/update/:id", async (req, res) => {
     try {
